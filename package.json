@@ -1,8 +1,8 @@
 {
   "name": "trnslt",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Micro translation library for dynamic text lookup and substitution",
-  "main": "index.js",
+  "main": "trnslt.js",
   "scripts": {
     "test": "mocha"
   },
