@@ -34,16 +34,20 @@ describe('Translate', function() {
         .to.eq('Hello trnslt, the framework');
     });
 
-    it('uses options for replacement', function() {
-      t.translations = { 'simple': '%{val}' };
-
-      expect(t.lookup('simple', { val: 'trnslt' })).to.eq('trnslt');
-    });
-
-    it('throws an unknown key error', function() {
+    it('throws an unknown key error with missing keys', function() {
       fn = function() { t.lookup('simple.path') };
 
       expect(fn).to.throw(/unknown translation/i);
+    });
+
+    it('does not throw an error with empty string keys', function() {
+      t.translations = {
+        'blank': ''
+      };
+
+      fn = function() { t.lookup('blank') };
+
+      expect(fn).not.to.throw(/unknown translation/i);
     });
   });
 });

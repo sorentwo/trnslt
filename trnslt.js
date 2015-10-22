@@ -12,7 +12,7 @@ Translate.prototype.lookup = function(path, options) {
   var buff = path.split(separator).reduce(function(trans, key) {
     var match = trans[key];
 
-    if (!match) {
+    if (match === null || match === undefined) {
       throw new Error('Unknown translation: ' + path + ', ' + key);
     } else {
       return trans[key];
