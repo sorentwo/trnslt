@@ -1,27 +1,58 @@
-var Translate = function(translations) {
+var Translate = function(translations, defaultLocale) {
   this.translations = translations || {};
+  this.defaultLocale = defaultLocale || "";
 };
 
-Translate.prototype.pattern   = /%\{(.+?)\}/g;
-Translate.prototype.separator = '.';
+Translate.prototype.pattern = /%\{(.+?)\}/g;
+Translate.prototype.separator = ".";
+
+function translationWasNotFound(string) {
+  return string === null || string === undefined;
+}
+
+function addDynamicContent(string, pattern, hash) {
+  return string.replace(pattern, (match, capture) => hash[capture]);
+}
 
 Translate.prototype.lookup = function(path, options) {
-  var hash      = options || {};
+  var hash = options || {};
   var separator = this.separator;
 
   var buff = path.split(separator).reduce(function(trans, key) {
     var match = trans[key];
 
-    if (match === null || match === undefined) {
-      throw new Error('Unknown translation: ' + path + ', ' + key);
+    if (translationWasNotFound(match)) {
+      throw new Error("Unknown translation: " + path + ", " + key);
     } else {
       return trans[key];
     }
   }, this.translations);
 
-  return buff.replace(this.pattern, function(match, capture) {
-    return hash[capture];
-  });
-}
+  return addDynamicContent(buff, this.pattern, hash);
+};
+
+Translate.prototype.localize = function(path, locale, options) {
+  if (locale === null || !(typeof locale === "string")) {
+    throw new Error("Must request a locale");
+  }
+
+  const requestedKey = `${locale}.${path}`;
+  const fallbackKey = `${this.defaultLocale}.${path}`;
+  const hash = options || {};
+  const separator = this.separator;
+
+  const localizedString = requestedKey.split(separator).reduce((trans, key) => {
+    if (trans == null || trans == undefined) {
+      return null;
+    }
+    return trans[key];
+  }, this.translations);
+
+  if (translationWasNotFound(localizedString)) {
+    return this.lookup(fallbackKey, hash);
+  }
+
+  return addDynamicContent(localizedString, this.pattern, hash);
+};
 
 module.exports = Translate;
