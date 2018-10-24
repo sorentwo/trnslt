@@ -11,7 +11,9 @@ function translationWasNotFound(string) {
 }
 
 function addDynamicContent(string, pattern, hash) {
-  return string.replace(pattern, (match, capture) => hash[capture]);
+  return string.replace(pattern, function(_, capture) {
+    return hash[capture];
+  });
 }
 
 Translate.prototype.lookup = function(path, options) {
@@ -36,12 +38,12 @@ Translate.prototype.localize = function(path, locale, options) {
     throw new Error("Must request a locale");
   }
 
-  const requestedKey = `${locale}.${path}`;
-  const fallbackKey = `${this.defaultLocale}.${path}`;
-  const hash = options || {};
-  const separator = this.separator;
+  var requestedKey = `${locale}.${path}`;
+  var fallbackKey = `${this.defaultLocale}.${path}`;
+  var hash = options || {};
+  var separator = this.separator;
 
-  const localizedString = requestedKey.split(separator).reduce((trans, key) => {
+  var localizedString = requestedKey.split(separator).reduce((trans, key) => {
     if (trans == null || trans == undefined) {
       return null;
     }
